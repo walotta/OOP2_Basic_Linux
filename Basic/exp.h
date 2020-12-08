@@ -18,7 +18,7 @@
  * expression types: CONSTANT, IDENTIFIER, and COMPOUND.
  */
 
-enum ExpressionType { CONSTANT, IDENTIFIER, COMPOUND };
+enum ExpressionType { CONSTANT, IDENTIFIER, COMPOUND };//常量，变量，表达式
 
 /*
  * Class: Expression
