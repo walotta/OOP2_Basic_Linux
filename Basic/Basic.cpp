@@ -75,7 +75,7 @@ void processLine(string line, Program & program, EvalState & state) {
        //value;// = exp->eval(state);
        //cout << value << endl;
        exp=readE(scanner);
-       cout<<"[write]"<<exp->toString()<<' '<<exp->getType()<<endl;
+       //cout<<"[write]"<<exp->toString()<<' '<<exp->getType()<<endl;
        if(exp->getType()==0)
        {
            if(scanner.hasMoreTokens())
@@ -133,10 +133,10 @@ void processLine(string line, Program & program, EvalState & state) {
                string name=exp->toString();
                if(scanner.hasMoreTokens())
                {
-                   error("too many tokens");
+                   error("input wrong");
                }else if(exp->getType()!=1)
                {
-                   error("assign:not a var");
+                   error("input wrong");
                }else
                {
                    // require a var
@@ -157,14 +157,14 @@ void processLine(string line, Program & program, EvalState & state) {
                            {
                                exp=readT(NumberVar);
                                if(exp->getType()==1)
-                                   error("have var when assign");
+                                   error("input wrong");
                            }
                            NumberVar.setInput(name+"="+NUMBER);
                            exp=readE(NumberVar);
-                           cout<<"[debug]exp: "<<exp->toString()<<endl;
+                           //cout<<"[debug]exp: "<<exp->toString()<<endl;
                            if(NumberVar.hasMoreTokens()||exp->getType()!=2)
                            {
-                               error("assign number invalid");
+                               error("input wrong");
                            }
                            //cout<<"[debug]exp :"<<exp->toString()<<endl;
                            exp->eval(state);
@@ -253,9 +253,25 @@ inline void evalExp(Expression* exp,EvalState & state)
 
 void wrongHandle(const string &message)
 {
-    //todo
-    // wrong handle
-    cout<<"[demo]your wrong with: "<<message<<endl;
+    //cout<<"[demo]your wrong with: "<<message<<endl;
+    if(message=="divide with 0")
+    {
+        cout<<"DIVIDE BY ZERO"<<endl;
+    }else if(message=="input wrong")
+    {
+        cout<<"INVALID NUMBER"<<endl;
+    }else if(message=="var is undefined")
+    {
+        cout<<"VARIABLE NOT DEFINED"<<endl;
+    }else if(message=="wrong line number")
+    {
+        //todo
+        // wrong line number
+        cout<<"LINE NUMBER ERROR"<<endl;
+    }else
+    {
+        cout<<"SYNTAX ERROR"<<endl;
+    }
 }
 
 inline void AssignVar(Expression* exp,const string &name,EvalState & state)
