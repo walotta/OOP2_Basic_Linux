@@ -8,8 +8,6 @@
  *
  */
 
-#define debug
-
 #include <cctype>
 #include <iostream>
 #include <string>
@@ -33,7 +31,7 @@ void wrongHandle(const string &message);
 int main() {
    EvalState state;
    Program program;
-   cout << "Stub implementation of BASIC" << endl;
+   //cout << "Stub implementation of BASIC" << endl;
    while (true) {
       try {
          processLine(getLine(), program, state);
@@ -61,6 +59,7 @@ int main() {
 //program 用于储存程序
 inline void avoidAssign(Expression* exp);
 inline void evalExp(Expression* exp,EvalState & state);
+inline void AssignVar(Expression* exp,EvalState & state);
 
 void processLine(string line, Program & program, EvalState & state) {
        TokenScanner scanner;
@@ -74,7 +73,7 @@ void processLine(string line, Program & program, EvalState & state) {
        //value;// = exp->eval(state);
        //cout << value << endl;
        exp=readE(scanner);
-       cout<<"[debug]"<<exp->toString()<<' '<<exp->getType()<<endl;
+       cout<<"[write]"<<exp->toString()<<' '<<exp->getType()<<endl;
        if(exp->getType()==0)
        {
            if(scanner.hasMoreTokens())
@@ -90,14 +89,13 @@ void processLine(string line, Program & program, EvalState & state) {
        {
            if(exp->toString()=="LET")
            {
-                exp=readE(scanner);
+               exp=readE(scanner);
                if(scanner.hasMoreTokens())
                {
                    error("too many tokens");
                }else
                {
-
-                   evalExp(exp,state);
+                   AssignVar(exp,state);
                }
            }else if(exp->toString()=="PRINT")
            {
@@ -106,7 +104,7 @@ void processLine(string line, Program & program, EvalState & state) {
                exp=readE(scanner);
                if(scanner.hasMoreTokens())
                {
-                   error("too many tokens");
+                   error("too many tokens or have =");
                }else
                {
                    evalExp(exp,state);
@@ -123,19 +121,32 @@ void processLine(string line, Program & program, EvalState & state) {
                }
            }else if(exp->toString()=="INPUT")
            {
-               exp=readE(scanner);
+               exp=readT(scanner);
+               string name=exp->toString();
                if(scanner.hasMoreTokens())
                {
                    error("too many tokens");
-               }if(exp->getType()!=1)
+               }else if(exp->getType()!=1)
                {
                    error("assign:not a var");
+               }else if(!state.isDefined(name))
+               {
+                   error("var not defined");
                }else
                {
-                   cout<<" ? ";
-                   //todo
                    // require a var
-                   cout<<endl;
+                   // wait to check
+                   TokenScanner NumberVar;
+                   NumberVar.ignoreWhitespace();
+                   NumberVar.scanNumbers();
+                   NumberVar.setInput(name+"="+getLine(" ? "));
+                   exp=readE(NumberVar);
+                   if(NumberVar.hasMoreTokens()||exp->getType()!=0)
+                   {
+                       error("assign number invalid");
+                   }
+                   //cout<<"[debug]exp :"<<exp->toString()<<endl;
+                   exp->eval(state);
                }
            }else if(exp->toString()=="LIST")
            {
@@ -180,13 +191,11 @@ void processLine(string line, Program & program, EvalState & state) {
            }
        }else if(exp->getType()==2)
        {
-           if(scanner.hasMoreTokens())
-           {
-               error("too many tokens");
-           }else
-           {
-               evalExp(exp,state);
-           }
+           error("can't be a exp");
+       }
+       if(scanner.hasMoreTokens())
+       {
+           error("have token left or receive invalid token");
        }
        delete exp;
 }
@@ -205,7 +214,11 @@ inline void avoidAssign(Expression* exp)
 inline void evalExp(Expression* exp,EvalState & state)
 {
     // avoid var=int(assign)
-    avoidAssign(exp);
+    //avoidAssign(exp);
+    if(((CompoundExp*)(exp))->getOp()=="=")
+    {
+        error("you assign wrong when eval");
+    }
     int value=exp->eval(state);
     cout<<value<<endl;
 }
@@ -214,5 +227,16 @@ void wrongHandle(const string &message)
 {
     //todo
     // wrong handle
-    cout<<"[demo]your wrong"<<endl;
+    cout<<"[demo]your wrong with: "<<message<<endl;
+}
+
+inline void AssignVar(Expression* exp,EvalState & state)
+{
+    if(((CompoundExp*)(exp))->getOp()!="=")
+    {
+        error("find no = in assign");
+    }else
+    {
+        exp->eval(state);
+    }
 }
