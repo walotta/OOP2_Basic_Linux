@@ -9,6 +9,7 @@
 #define _program_h
 
 #include <string>
+#include <map>
 #include "statement.h"
 using namespace std;
 
@@ -138,7 +139,12 @@ public:
 private:
 
 // Fill this in with whatever types and instance variables you need
-
+struct data
+{
+    data* next= nullptr;
+    string command;
+};
+data* head= nullptr;
 };
 
 #endif

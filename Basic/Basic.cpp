@@ -59,7 +59,9 @@ int main() {
 //program 用于储存程序
 inline void avoidAssign(Expression* exp);
 inline void evalExp(Expression* exp,EvalState & state);
-inline void AssignVar(Expression* exp,EvalState & state);
+inline void AssignVar(Expression* exp,const string &name,EvalState & state);
+inline bool VarNameCheck(const string &name);
+string key[13]={"REM","INPUT","LET","PRINT","END","GOTO","IF","THEN","RUN","LIST","CLEAR","QUIT","HELP"};
 
 void processLine(string line, Program & program, EvalState & state) {
        TokenScanner scanner;
@@ -89,17 +91,23 @@ void processLine(string line, Program & program, EvalState & state) {
        {
            if(exp->toString()=="LET")
            {
+               //todo
+               // name wrong?
                exp=readE(scanner);
-               if(scanner.hasMoreTokens())
+               if(exp->getType()!=2)
+               {
+                   error("not a assign command");
+               }else if(scanner.hasMoreTokens())
                {
                    error("too many tokens");
                }else
                {
-                   AssignVar(exp,state);
+                   string name;
+                   name=(((CompoundExp*)exp)->getLHS())->toString();
+                   AssignVar(exp,name,state);
                }
            }else if(exp->toString()=="PRINT")
            {
-               //todo
                // avoid mul exp
                exp=readE(scanner);
                if(scanner.hasMoreTokens())
@@ -129,9 +137,6 @@ void processLine(string line, Program & program, EvalState & state) {
                }else if(exp->getType()!=1)
                {
                    error("assign:not a var");
-               }else if(!state.isDefined(name))
-               {
-                   error("var not defined");
                }else
                {
                    // require a var
@@ -139,14 +144,37 @@ void processLine(string line, Program & program, EvalState & state) {
                    TokenScanner NumberVar;
                    NumberVar.ignoreWhitespace();
                    NumberVar.scanNumbers();
-                   NumberVar.setInput(name+"="+getLine(" ? "));
-                   exp=readE(NumberVar);
-                   if(NumberVar.hasMoreTokens()||exp->getType()!=0)
+
+                   bool flag=true;
+                   while(flag)
                    {
-                       error("assign number invalid");
+                       try{
+                           flag= false;
+                           string NUMBER;
+                           NUMBER=getLine(" ? ");
+                           NumberVar.setInput(NUMBER);
+                           while (NumberVar.hasMoreTokens())
+                           {
+                               exp=readT(NumberVar);
+                               if(exp->getType()==1)
+                                   error("have var when assign");
+                           }
+                           NumberVar.setInput(name+"="+NUMBER);
+                           exp=readE(NumberVar);
+                           cout<<"[debug]exp: "<<exp->toString()<<endl;
+                           if(NumberVar.hasMoreTokens()||exp->getType()!=2)
+                           {
+                               error("assign number invalid");
+                           }
+                           //cout<<"[debug]exp :"<<exp->toString()<<endl;
+                           exp->eval(state);
+                       }catch(...)
+                       {
+                           //error("assign number invalid");
+                           cout<<"INVALID NUMBER"<<endl;
+                           flag=true;
+                       }
                    }
-                   //cout<<"[debug]exp :"<<exp->toString()<<endl;
-                   exp->eval(state);
                }
            }else if(exp->toString()=="LIST")
            {
@@ -230,13 +258,27 @@ void wrongHandle(const string &message)
     cout<<"[demo]your wrong with: "<<message<<endl;
 }
 
-inline void AssignVar(Expression* exp,EvalState & state)
+inline void AssignVar(Expression* exp,const string &name,EvalState & state)
 {
     if(((CompoundExp*)(exp))->getOp()!="=")
     {
         error("find no = in assign");
     }else
     {
+        //cout<<"[debug]name: "<<name<<endl;
+        if(VarNameCheck(name))
+        {
+            error("var name invalid");
+        }
         exp->eval(state);
     }
+}
+
+inline bool VarNameCheck(const string &name)
+{
+    for(int i=0;i<13;i++)
+    {
+        if(name==key[i])return true;
+    }
+    return false;
 }
