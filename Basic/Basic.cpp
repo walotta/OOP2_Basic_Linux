@@ -8,6 +8,8 @@
  *
  */
 
+#define debug
+
 #include <cctype>
 #include <iostream>
 #include <string>
@@ -24,6 +26,7 @@ using namespace std;
 /* Function prototypes */
 
 void processLine(string line, Program & program, EvalState & state);
+void wrongHandle(const string &message);
 
 /* Main program */
 
@@ -35,7 +38,7 @@ int main() {
       try {
          processLine(getLine(), program, state);
       } catch (ErrorException & ex) {
-         cerr << "Error: " << ex.getMessage() << endl;
+         wrongHandle(ex.getMessage());
       }
    }
    return 0;
@@ -56,76 +59,160 @@ int main() {
 
 //state 用于变量储存
 //program 用于储存程序
+inline void avoidAssign(Expression* exp);
+inline void evalExp(Expression* exp,EvalState & state);
+
 void processLine(string line, Program & program, EvalState & state) {
-   TokenScanner scanner;
-   scanner.ignoreWhitespace();//要求去除空格
-   scanner.scanNumbers();//要求寻找数字
-   scanner.setInput(line);//制定输入流
-   Expression *exp;
-   // cout<<exp->getType()<<endl;
-   //int value;// = exp->eval(state);
-   //cout << value << endl;
+       TokenScanner scanner;
+       scanner.ignoreWhitespace();//要求去除空格
+       scanner.scanNumbers();//要求寻找数字
+       scanner.setInput(line);//制定输入流
+       Expression *exp;
 
-    //exp = readE(scanner);
-    //cout<<exp->getType()<<endl;
-    //value;// = exp->eval(state);
-    //cout << value << endl;
-    exp=readE(scanner);
-    cout<<exp->toString()<<' '<<exp->getType()<<endl;
-    if(exp->getType()==0)
+       //exp = readE(scanner);
+       //cout<<exp->getType()<<endl;
+       //value;// = exp->eval(state);
+       //cout << value << endl;
+       exp=readE(scanner);
+       cout<<"[debug]"<<exp->toString()<<' '<<exp->getType()<<endl;
+       if(exp->getType()==0)
+       {
+           if(scanner.hasMoreTokens())
+           {
+               //todo
+               // add a new line
+           }else
+           {
+               //todo
+               // delete a line
+           }
+       }else if(exp->getType()==1)
+       {
+           if(exp->toString()=="LET")
+           {
+                exp=readE(scanner);
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+
+                   evalExp(exp,state);
+               }
+           }else if(exp->toString()=="PRINT")
+           {
+               //todo
+               // avoid mul exp
+               exp=readE(scanner);
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   evalExp(exp,state);
+               }
+           }else if(exp->toString()=="RUN")
+           {
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   //todo
+                   // run the program
+               }
+           }else if(exp->toString()=="INPUT")
+           {
+               exp=readE(scanner);
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }if(exp->getType()!=1)
+               {
+                   error("assign:not a var");
+               }else
+               {
+                   cout<<" ? ";
+                   //todo
+                   // require a var
+                   cout<<endl;
+               }
+           }else if(exp->toString()=="LIST")
+           {
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   //todo
+                   // list all line
+               }
+           }else if(exp->toString()=="CLEAR")
+           {
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   //todo
+                   // delete a line
+               }
+           }else if(exp->toString()=="QUIT")
+           {if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   exit(0);
+               }
+           }else if(exp->toString()=="HELP")
+           {
+               if(scanner.hasMoreTokens())
+               {
+                   error("too many tokens");
+               }else
+               {
+                   cout<<"Yet another basic interpreter"<<endl;
+               }
+           }else
+           {
+               error("no match exp");
+           }
+       }else if(exp->getType()==2)
+       {
+           if(scanner.hasMoreTokens())
+           {
+               error("too many tokens");
+           }else
+           {
+               evalExp(exp,state);
+           }
+       }
+       delete exp;
+}
+
+inline void avoidAssign(Expression* exp)
+{
+    string check;
+    check=exp->toString();
+    int len=check.length();
+    for(int i=0;i<len;i++)
     {
-        if(scanner.hasMoreTokens())
-        {
-            //todo
-            // add a new line
-        }else
-        {
-            //todo
-            // delete a line
-        }
-    }else if(exp->getType()==1)
-    {
-        if(exp->toString()=="LET")
-        {
-
-        }else if(exp->toString()=="IF")
-        {
-
-        }else if(exp->toString()=="PRINT")
-        {
-
-        }else if(exp->toString()=="GOTO")
-        {
-
-        }else if(exp->toString()=="REM")
-        {
-
-        }else if(exp->toString()=="END")
-        {
-
-        }else if(exp->toString()=="RUN")
-        {
-
-        }else if(exp->toString()=="INPUT")
-        {
-
-        }else if(exp->toString()=="LIST")
-        {
-
-        }else if(exp->toString()=="CLEAR")
-        {
-
-        }else if(exp->toString()=="QUIT")
-        {
-            exit(0);
-        }else if(exp->toString()=="HELP")
-        {
-
-        }
-    }else if(exp->getType()==2)
-    {
-        int value=exp->eval(state);
-        cout<<value<<endl;
+        if(check[i]=='=')error("invalid expression:you assign wrong");
     }
-   delete exp;
+}
+
+inline void evalExp(Expression* exp,EvalState & state)
+{
+    // avoid var=int(assign)
+    avoidAssign(exp);
+    int value=exp->eval(state);
+    cout<<value<<endl;
+}
+
+void wrongHandle(const string &message)
+{
+    //todo
+    // wrong handle
+    cout<<"[demo]your wrong"<<endl;
 }
