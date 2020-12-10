@@ -22,62 +22,95 @@ Program::~Program() {
 }
 
 void Program::clear() {
-   // Replace this stub with your own code
+   program_store.erase(program_store.begin(),program_store.end());
 }
 
 void Program::addSourceLine(int lineNumber, string line) {
-   // Replace this stub with your own code
+    program_store.erase(lineNumber);
+    program_store.insert(make_pair(lineNumber,data(line)));
 }
 
 void Program::removeSourceLine(int lineNumber) {
-   // Replace this stub with your own code
+    program_store.erase(lineNumber);
 }
 
 string Program::getSourceLine(int lineNumber) {
-   return "";    // Replace this stub with your own code
+   if(program_store.count(lineNumber))
+   {
+       return "not_find";
+   }else
+   {
+       return program_store[lineNumber].command;
+   }
 }
 
 void Program::setParsedStatement(int lineNumber, Statement *stmt) {
-   // Replace this stub with your own code
+   //do nothing
 }
 
 Statement *Program::getParsedStatement(int lineNumber) {
-   return NULL;  // Replace this stub with your own code
+    //do nothing
+   return NULL;
 }
 
 int Program::getFirstLineNumber() {
-   return 0;     // Replace this stub with your own code
+    if(program_store.empty())
+    {
+        return -1;
+    }
+    auto it_store=program_store.begin();
+    return it_store->first;
 }
 
 int Program::getNextLineNumber(int lineNumber) {
-   return 0;     // Replace this stub with your own code
+   auto it_store=program_store.find(lineNumber);
+   it_store++;
+   if(it_store==program_store.end())
+   {
+       return -1;
+   }else
+   {
+       return it_store->first;
+   }
 }
 
-Program::data::data(TokenScanner in_code)
+Program::data::data(string in_code)
 {
+    command=in_code;
     string CMD;
-    CMD=in_code.nextToken();
+    TokenScanner in_scanner;
+    in_scanner.ignoreWhitespace();
+    in_scanner.scanNumbers();
+    in_scanner.setInput(in_code);
+    CMD=in_scanner.nextToken();
     if(CMD=="REM")
     {
-
+        cmd_state=new RemState(command);
     }else if(CMD=="PRINT")
     {
-
+        cmd_state=new PrintState(in_scanner);
     }else if(CMD=="INPUT")
     {
-
+        cmd_state=new InputState(in_scanner);
     }else if(CMD=="END")
     {
-
+        if(in_scanner.hasMoreTokens())
+        {
+            error("wrong end cmd");
+        }
+        cmd_state=new EndState();
     }else if(CMD=="GOTO")
     {
-
+        cmd_state=new GotoState(in_scanner);
     }else if(CMD=="IF")
     {
-
+        string if_in=in_code;
+        wzj::DeleteWhite(if_in);
+        if_in.erase(0,2);
+        cmd_state=new IfState(if_in);
     }else if(CMD=="LET")
     {
-
+        cmd_state=new LetState(in_scanner);
     }else
     {
         error("not fit cmd");
@@ -86,5 +119,5 @@ Program::data::data(TokenScanner in_code)
 
 Program::data::~data()
 {
-
+    delete cmd_state;
 }

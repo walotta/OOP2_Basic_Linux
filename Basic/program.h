@@ -142,9 +142,9 @@ private:
 class data
 {
 public:
-    data(TokenScanner in_code);//无行号代码
+    data(string in_code);//无行号代码
     ~data();
-    Statement* cmd_state;
+    Statement* cmd_state=nullptr;
     string command;
 };
 

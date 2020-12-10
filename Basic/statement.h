@@ -87,9 +87,9 @@ public:
 class RemState: public Statement
 {
 private:
-    //empty
+    string store;
 public:
-    RemState();
+    RemState(string x);
     ~RemState();
     void execute(EvalState &state) override;
 };

@@ -220,14 +220,14 @@ void IfState::execute(EvalState &state)
     }
 }
 
-RemState::RemState()
+RemState::RemState(string x)
 {
-    //empty
+    store=x;
 }
 
 void RemState::execute(EvalState &state)
 {
-    //empty
+    cout<<store<<endl;
 }
 
 RemState::~RemState()
