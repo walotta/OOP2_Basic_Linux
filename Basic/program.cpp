@@ -14,11 +14,11 @@
 using namespace std;
 
 Program::Program() {
-   // Replace this stub with your own code
+   //empty
 }
 
 Program::~Program() {
-   // Replace this stub with your own code
+   //empty
 }
 
 void Program::clear() {
@@ -53,3 +53,38 @@ int Program::getNextLineNumber(int lineNumber) {
    return 0;     // Replace this stub with your own code
 }
 
+Program::data::data(TokenScanner in_code)
+{
+    string CMD;
+    CMD=in_code.nextToken();
+    if(CMD=="REM")
+    {
+
+    }else if(CMD=="PRINT")
+    {
+
+    }else if(CMD=="INPUT")
+    {
+
+    }else if(CMD=="END")
+    {
+
+    }else if(CMD=="GOTO")
+    {
+
+    }else if(CMD=="IF")
+    {
+
+    }else if(CMD=="LET")
+    {
+
+    }else
+    {
+        error("not fit cmd");
+    }
+}
+
+Program::data::~data()
+{
+
+}

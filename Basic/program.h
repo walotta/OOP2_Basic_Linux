@@ -139,12 +139,16 @@ public:
 private:
 
 // Fill this in with whatever types and instance variables you need
-struct data
+class data
 {
-    data* next= nullptr;
+public:
+    data(TokenScanner in_code);//无行号代码
+    ~data();
+    Statement* cmd_state;
     string command;
 };
-data* head= nullptr;
+
+map<int , data> program_store;
 };
 
 #endif

@@ -60,3 +60,5 @@ add_executable(OOP2_Basic_Linux
         StanfordCPPLib/tokenscanner.cpp
         StanfordCPPLib/tokenscanner.h
         StanfordCPPLib/vector.h)
+        #Basic/MyFunction.h
+        #Basic/MyFunction.cpp)

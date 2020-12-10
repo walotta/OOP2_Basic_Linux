@@ -24,7 +24,6 @@ using namespace std;
 /* Function prototypes */
 
 void processLine(string line, Program & program, EvalState & state);
-void wrongHandle(const string &message);
 
 /* Main program */
 
@@ -36,7 +35,7 @@ int main() {
       try {
          processLine(getLine(), program, state);
       } catch (ErrorException & ex) {
-         wrongHandle(ex.getMessage());
+         wzj::wrongHandle(ex.getMessage());
       }
    }
    return 0;
@@ -57,11 +56,6 @@ int main() {
 
 //state 用于变量储存
 //program 用于储存程序
-inline void avoidAssign(Expression* exp);
-inline void evalExp(Expression* exp,EvalState & state);
-inline void AssignVar(Expression* exp,const string &name,EvalState & state);
-inline bool VarNameCheck(const string &name);
-string key[13]={"REM","INPUT","LET","PRINT","END","GOTO","IF","THEN","RUN","LIST","CLEAR","QUIT","HELP"};
 
 void processLine(string line, Program & program, EvalState & state) {
        TokenScanner scanner;
@@ -104,7 +98,7 @@ void processLine(string line, Program & program, EvalState & state) {
                {
                    string name;
                    name=(((CompoundExp*)exp)->getLHS())->toString();
-                   AssignVar(exp,name,state);
+                   wzj::AssignVar(exp,name,state);
                }
            }else if(exp->toString()=="PRINT")
            {
@@ -115,7 +109,7 @@ void processLine(string line, Program & program, EvalState & state) {
                    error("too many tokens or have =");
                }else
                {
-                   evalExp(exp,state);
+                   wzj::evalExp(exp,state);
                }
            }else if(exp->toString()=="RUN")
            {
@@ -226,75 +220,4 @@ void processLine(string line, Program & program, EvalState & state) {
            error("have token left or receive invalid token");
        }
        delete exp;
-}
-
-inline void avoidAssign(Expression* exp)
-{
-    string check;
-    check=exp->toString();
-    int len=check.length();
-    for(int i=0;i<len;i++)
-    {
-        if(check[i]=='=')error("invalid expression:you assign wrong");
-    }
-}
-
-inline void evalExp(Expression* exp,EvalState & state)
-{
-    // avoid var=int(assign)
-    //avoidAssign(exp);
-    if(((CompoundExp*)(exp))->getOp()=="=")
-    {
-        error("you assign wrong when eval");
-    }
-    int value=exp->eval(state);
-    cout<<value<<endl;
-}
-
-void wrongHandle(const string &message)
-{
-    //cout<<"[demo]your wrong with: "<<message<<endl;
-    if(message=="divide with 0")
-    {
-        cout<<"DIVIDE BY ZERO"<<endl;
-    }else if(message=="input wrong")
-    {
-        cout<<"INVALID NUMBER"<<endl;
-    }else if(message=="var is undefined")
-    {
-        cout<<"VARIABLE NOT DEFINED"<<endl;
-    }else if(message=="wrong line number")
-    {
-        //todo
-        // wrong line number
-        cout<<"LINE NUMBER ERROR"<<endl;
-    }else
-    {
-        cout<<"SYNTAX ERROR"<<endl;
-    }
-}
-
-inline void AssignVar(Expression* exp,const string &name,EvalState & state)
-{
-    if(((CompoundExp*)(exp))->getOp()!="=")
-    {
-        error("find no = in assign");
-    }else
-    {
-        //cout<<"[debug]name: "<<name<<endl;
-        if(VarNameCheck(name))
-        {
-            error("var name invalid");
-        }
-        exp->eval(state);
-    }
-}
-
-inline bool VarNameCheck(const string &name)
-{
-    for(int i=0;i<13;i++)
-    {
-        if(name==key[i])return true;
-    }
-    return false;
 }

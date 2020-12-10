@@ -14,7 +14,16 @@
 
 #include "evalstate.h"
 #include "exp.h"
-
+#include "parser.h"
+namespace wzj
+{
+    static string key_word[13]={"REM","INPUT","LET","PRINT","END","GOTO","IF","THEN","RUN","LIST","CLEAR","QUIT","HELP"};
+    void wrongHandle(const string &message);
+    void evalExp(Expression* exp,EvalState & state);
+    void AssignVar(Expression* exp,const string &name,EvalState & state);
+    bool VarNameCheck(const string &name);
+    void DeleteWhite(string &x);
+}
 /*
  * Class: Statement
  * ----------------
@@ -75,4 +84,78 @@ public:
  * specify its own destructor method to free that memory.
  */
 
+class RemState: public Statement
+{
+private:
+    //empty
+public:
+    RemState();
+    ~RemState();
+    void execute(EvalState &state) override;
+};
+
+class PrintState: public Statement
+{
+private:
+    Expression* Exp;
+public:
+    PrintState(TokenScanner &scanner);
+    ~PrintState();
+    void execute(EvalState &state) override;
+};
+
+class InputState: public Statement
+{
+private:
+    Expression* Exp;
+    string name;
+public:
+    InputState(TokenScanner &scanner);
+    ~InputState();
+    void execute(EvalState &state) override;
+};
+
+class EndState: public Statement
+{
+private:
+    //empty
+public:
+    EndState();
+    ~EndState();
+    void execute(EvalState &state) override;
+};
+
+class GotoState: public Statement
+{
+private:
+    string line_number;
+public:
+    GotoState(TokenScanner &scanner);
+    ~GotoState();
+    void execute(EvalState &state) override;
+};
+
+class IfState: public Statement
+{
+private:
+    Expression* left;
+    Expression* right;
+    char Operator;
+    string line_number;
+public:
+    IfState(string In);
+    ~IfState();
+    void execute(EvalState &state) override;
+};
+
+class LetState: public Statement
+{
+private:
+    Expression* Exp;
+    string name;
+public:
+    LetState(TokenScanner &scanner);
+    ~LetState();
+    void execute(EvalState &state) override;
+};
 #endif
