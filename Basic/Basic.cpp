@@ -161,6 +161,9 @@ void processLine(string line, Program & program, EvalState & state) {
                        if(now_line!=program.getEndLineNumber())
                        {
                            now_line=program.getNextLineNumber(now_line);
+                       }else
+                       {
+                           run_flag=false;
                        }
                    }
                }
