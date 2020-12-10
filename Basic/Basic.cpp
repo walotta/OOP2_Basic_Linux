@@ -212,6 +212,7 @@ void processLine(string line, Program & program, EvalState & state) {
                }else
                {
                    program.clear();
+                   state.clear();
                }
            }else if(exp->toString()=="QUIT")
            {if(scanner.hasMoreTokens())
