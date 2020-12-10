@@ -226,7 +226,8 @@ RemState::RemState(string x)
 
 void RemState::execute(EvalState &state)
 {
-    cout<<store<<endl;
+    //do nothing
+    //cout<<store<<endl;
 }
 
 RemState::~RemState()
