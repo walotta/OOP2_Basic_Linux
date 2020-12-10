@@ -35,12 +35,12 @@ void Program::removeSourceLine(int lineNumber) {
 }
 
 string Program::getSourceLine(int lineNumber) {
-   if(program_store.count(lineNumber))
+   if(program_store.count(lineNumber)==0)
    {
        return "not_find";
    }else
    {
-       return program_store[lineNumber].command;
+       return (program_store.find(lineNumber)->second).command;
    }
 }
 
@@ -49,8 +49,13 @@ void Program::setParsedStatement(int lineNumber, Statement *stmt) {
 }
 
 Statement *Program::getParsedStatement(int lineNumber) {
-    //do nothing
-   return NULL;
+    if(program_store.count(lineNumber)==0)
+    {
+        return nullptr;
+    }else
+    {
+        return program_store[lineNumber].cmd_state;
+    }
 }
 
 int Program::getFirstLineNumber() {
@@ -74,50 +79,26 @@ int Program::getNextLineNumber(int lineNumber) {
    }
 }
 
-Program::data::data(string in_code)
+void Program::printAllLine()
 {
-    command=in_code;
-    string CMD;
-    TokenScanner in_scanner;
-    in_scanner.ignoreWhitespace();
-    in_scanner.scanNumbers();
-    in_scanner.setInput(in_code);
-    CMD=in_scanner.nextToken();
-    if(CMD=="REM")
+    if(program_store.empty())
     {
-        cmd_state=new RemState(command);
-    }else if(CMD=="PRINT")
-    {
-        cmd_state=new PrintState(in_scanner);
-    }else if(CMD=="INPUT")
-    {
-        cmd_state=new InputState(in_scanner);
-    }else if(CMD=="END")
-    {
-        if(in_scanner.hasMoreTokens())
-        {
-            error("wrong end cmd");
-        }
-        cmd_state=new EndState();
-    }else if(CMD=="GOTO")
-    {
-        cmd_state=new GotoState(in_scanner);
-    }else if(CMD=="IF")
-    {
-        string if_in=in_code;
-        wzj::DeleteWhite(if_in);
-        if_in.erase(0,2);
-        cmd_state=new IfState(if_in);
-    }else if(CMD=="LET")
-    {
-        cmd_state=new LetState(in_scanner);
+        return;
     }else
     {
-        error("not fit cmd");
+        //遍历出错？
+        for(auto &it:program_store)
+        {
+            cout<<(it.second).command<<endl;
+        }
     }
+    return;
 }
 
-Program::data::~data()
+int Program::getEndLineNumber()
 {
-    delete cmd_state;
+    auto it=program_store.end();
+    it--;
+    return it->first;
 }
+

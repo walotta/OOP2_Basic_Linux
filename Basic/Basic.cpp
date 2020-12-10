@@ -11,6 +11,7 @@
 #include <cctype>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "exp.h"
 #include "parser.h"
 #include "program.h"
@@ -74,19 +75,23 @@ void processLine(string line, Program & program, EvalState & state) {
        {
            if(scanner.hasMoreTokens())
            {
-               //todo
-               // add a new line
+               stringstream ss;
+               ss<<exp->toString();
+               int LineNumber;
+               ss>>LineNumber;
+               program.addSourceLine(LineNumber,line);
            }else
            {
-               //todo
-               // delete a line
+               stringstream ss;
+               ss<<exp->toString();
+               int LineNumber;
+               ss>>LineNumber;
+               program.removeSourceLine(LineNumber);
            }
        }else if(exp->getType()==1)
        {
            if(exp->toString()=="LET")
            {
-               //todo
-               // name wrong?
                exp=readE(scanner);
                if(exp->getType()!=2)
                {
@@ -118,8 +123,44 @@ void processLine(string line, Program & program, EvalState & state) {
                    error("too many tokens");
                }else
                {
-                   //todo
-                   // run the program
+                   bool run_flag=true;
+                   int now_line=program.getFirstLineNumber();
+                   if(now_line==-1)run_flag=false;
+                   while(run_flag)
+                   {
+                       try{
+                           program.getParsedStatement(now_line)->execute(state);
+                       }catch (ErrorException & ex){
+                           string wrongMessage=ex.getMessage();
+                           stringstream ss_ex;
+                           ss_ex<<wrongMessage;
+                           string first_word;
+                           ss_ex>>first_word;
+                           if(first_word=="to_line")
+                           {
+                               int next_line_number;
+                               ss_ex>>next_line_number;
+                               if(next_line_number==-1)
+                               {
+                                   run_flag=false;
+                               }else if(program.getParsedStatement(next_line_number)==nullptr)
+                               {
+                                   error("wrong line number");
+                               }else
+                               {
+                                   now_line=next_line_number;
+                                   continue;
+                               }
+                           }else
+                           {
+                               error(wrongMessage);
+                           }
+                       }
+                       if(now_line!=program.getEndLineNumber())
+                       {
+                           now_line=program.getNextLineNumber(now_line);
+                       }
+                   }
                }
            }else if(exp->toString()=="INPUT")
            {
@@ -177,8 +218,7 @@ void processLine(string line, Program & program, EvalState & state) {
                    error("too many tokens");
                }else
                {
-                   //todo
-                   // list all line
+                   program.printAllLine();
                }
            }else if(exp->toString()=="CLEAR")
            {
@@ -187,8 +227,7 @@ void processLine(string line, Program & program, EvalState & state) {
                    error("too many tokens");
                }else
                {
-                   //todo
-                   // delete a line
+                   program.clear();
                }
            }else if(exp->toString()=="QUIT")
            {if(scanner.hasMoreTokens())

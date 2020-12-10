@@ -136,14 +136,72 @@ public:
 
    int getNextLineNumber(int lineNumber);
 
+   void printAllLine();
+
+   int getEndLineNumber();
+
 private:
 
 // Fill this in with whatever types and instance variables you need
 class data
 {
 public:
-    data(string in_code);//无行号代码
-    ~data();
+    data(string in_code)
+    {
+        command=in_code;
+        wzj::DeleteWhite(in_code);
+        while(in_code[0]>='0'&&in_code[0]<='9')
+        {
+            in_code.erase(0,1);
+        }
+        string CMD;
+        TokenScanner in_scanner;
+        in_scanner.ignoreWhitespace();
+        in_scanner.scanNumbers();
+        in_scanner.setInput(in_code);
+        CMD=in_scanner.nextToken();
+        if(CMD=="REM")
+        {
+            cmd_state=new RemState(command);
+        }else if(CMD=="PRINT")
+        {
+            cmd_state=new PrintState(in_scanner);
+        }else if(CMD=="INPUT")
+        {
+            cmd_state=new InputState(in_scanner);
+        }else if(CMD=="END")
+        {
+            if(in_scanner.hasMoreTokens())
+            {
+                error("wrong end cmd");
+            }
+            cmd_state=new EndState();
+        }else if(CMD=="GOTO")
+        {
+            cmd_state=new GotoState(in_scanner);
+        }else if(CMD=="IF")
+        {
+            string if_in=in_code;
+            wzj::DeleteWhite(if_in);
+            if_in.erase(0,2);
+            cmd_state=new IfState(if_in);
+        }else if(CMD=="LET")
+        {
+            cmd_state=new LetState(in_scanner);
+        }else
+        {
+            error("not fit cmd");
+        }
+    }
+    data()
+    {
+        cmd_state=nullptr;
+        command="";
+    }
+    ~data()
+    {
+        delete cmd_state;
+    }
     Statement* cmd_state=nullptr;
     string command;
 };

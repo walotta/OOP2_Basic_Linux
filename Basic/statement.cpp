@@ -205,7 +205,6 @@ IfState::~IfState()
 
 void IfState::execute(EvalState &state)
 {
-    //todo
     const int left_val=left->eval(state);
     const int right_val=right->eval(state);
     if(Operator=='<')
@@ -280,8 +279,6 @@ void wzj::wrongHandle(const string &message)
         cout<<"VARIABLE NOT DEFINED"<<endl;
     }else if(message=="wrong line number")
     {
-        //todo
-        // wrong line number
         cout<<"LINE NUMBER ERROR"<<endl;
     }else
     {
