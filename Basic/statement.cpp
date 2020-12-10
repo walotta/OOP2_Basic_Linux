@@ -138,7 +138,7 @@ GotoState::GotoState(TokenScanner &scanner)
     {
         error("line_number input error");
     }
-    line_number=tem_exp->getType();
+    line_number=tem_exp->toString();
     delete tem_exp;
 }
 
