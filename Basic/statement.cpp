@@ -35,9 +35,12 @@ PrintState::PrintState(TokenScanner &scanner)
     if(scanner.hasMoreTokens())
     {
         error("too many tokens or have =");
-    }else if(((CompoundExp*)(Exp))->getOp()=="=")
+    }else if(Exp->getType()==2)
     {
-        error("you assign wrong when eval");
+        if(((CompoundExp*)(Exp))->getOp()=="=")
+        {
+            error("you assign wrong when eval");
+        }
     }
 }
 
@@ -291,9 +294,12 @@ void wzj::evalExp(Expression* exp,EvalState & state)
 {
     // avoid var=int(assign)
     //avoidAssign(exp);
-    if(((CompoundExp*)(exp))->getOp()=="=")
+    if(exp->getType()==2)
     {
-        error("you assign wrong when eval");
+        if(((CompoundExp*)(exp))->getOp()=="=")
+        {
+            error("you assign wrong when eval");
+        }
     }
     int value=exp->eval(state);
     cout<<value<<endl;
