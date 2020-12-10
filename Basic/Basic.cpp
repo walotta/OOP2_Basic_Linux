@@ -178,10 +178,6 @@ void processLine(string line, Program & program, EvalState & state) {
                {
                    // require a var
                    // wait to check
-                   TokenScanner NumberVar;
-                   NumberVar.ignoreWhitespace();
-                   NumberVar.scanNumbers();
-
                    bool flag=true;
                    while(flag)
                    {
@@ -189,22 +185,8 @@ void processLine(string line, Program & program, EvalState & state) {
                            flag= false;
                            string NUMBER;
                            NUMBER=getLine(" ? ");
-                           NumberVar.setInput(NUMBER);
-                           while (NumberVar.hasMoreTokens())
-                           {
-                               exp=readT(NumberVar);
-                               if(exp->getType()==1)
-                                   error("input wrong");
-                           }
-                           NumberVar.setInput(name+"="+NUMBER);
-                           exp=readE(NumberVar);
-                           //cout<<"[debug]exp: "<<exp->toString()<<endl;
-                           if(NumberVar.hasMoreTokens()||exp->getType()!=2)
-                           {
-                               error("input wrong");
-                           }
-                           //cout<<"[debug]exp :"<<exp->toString()<<endl;
-                           exp->eval(state);
+                           int var_number=stringToInteger(NUMBER);
+                           state.setValue(name,var_number);
                        }catch(...)
                        {
                            //error("assign number invalid");
