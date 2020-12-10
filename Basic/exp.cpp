@@ -126,7 +126,11 @@ int CompoundExp::eval(EvalState & state) {
    if (op == "-") return left - right;
    if (op == "*") return left * right;
    try{
-       if (op == "/") return left / right;
+       if (op == "/")
+       {
+           if(right==0)error("with 0");
+           return left / right;
+       }
    }catch(...)
    {
        error("divide with 0");
