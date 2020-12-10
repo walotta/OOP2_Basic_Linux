@@ -198,9 +198,17 @@ public:
         cmd_state=nullptr;
         command="";
     }
+    void operator=(data &&o)
+    {
+        //cout<<"sghazuiydcghasyiudghaiuh"<<endl;
+        if(cmd_state!=nullptr)delete cmd_state;
+        cmd_state=o.cmd_state;
+        o.cmd_state=nullptr;
+        command=o.command;
+    }
     ~data()
     {
-        delete cmd_state;
+        if(cmd_state!=nullptr)delete cmd_state;
     }
     Statement* cmd_state=nullptr;
     string command;

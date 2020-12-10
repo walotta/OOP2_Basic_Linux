@@ -70,7 +70,7 @@ void processLine(string line, Program & program, EvalState & state) {
        //value;// = exp->eval(state);
        //cout << value << endl;
        exp=readE(scanner);
-       //cout<<"[write]"<<exp->toString()<<' '<<exp->getType()<<endl;
+       //cout<<"[debug]"<<line<<endl;
        if(exp->getType()==0)
        {
            if(scanner.hasMoreTokens())
@@ -88,6 +88,8 @@ void processLine(string line, Program & program, EvalState & state) {
                ss>>LineNumber;
                program.removeSourceLine(LineNumber);
            }
+           delete exp;
+           return;
        }else if(exp->getType()==1)
        {
            if(exp->toString()=="LET")
