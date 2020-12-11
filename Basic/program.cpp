@@ -26,8 +26,9 @@ void Program::clear() {
 }
 
 void Program::addSourceLine(int lineNumber, string line) {
+    data try_add(line);
     program_store.erase(lineNumber);
-    //program_store.insert(make_pair(lineNumber,data{line}));
+    //program_store.insert(make_pair(lineNumber,data(line)));
     program_store[lineNumber]=data(line);
 }
 
