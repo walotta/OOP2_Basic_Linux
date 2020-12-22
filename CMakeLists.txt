@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.17)
-project(OOP2_Basic_Linux)
+project(code)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(OOP2_Basic_Linux
+add_executable(code
         #main.cpp
         Basic/Basic.cpp
         Basic/evalstate.h
